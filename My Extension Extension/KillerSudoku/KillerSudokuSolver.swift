@@ -12,6 +12,7 @@ class KillerSudokuSolver {
     let board:KillerSudokuBoard
     var solution:String
     let MAX = [0, 9, 17, 24, 30, 35, 39, 42, 44, 45]
+    let MIN = [0, 1,  3,  6, 10, 15, 21, 28, 36, 45]
     
     init(board:KillerSudokuBoard) {
         self.board = board
@@ -20,6 +21,12 @@ class KillerSudokuSolver {
     
     func solve() -> Bool {
         var work = Array(repeating: 0, count: 81);
+        splitBlocks()
+        for b in board.blocks {
+            if (b.cells.count == 1) {
+                work[b.cells[0]] = b.target
+            }
+        }
         if solveRecurse(work:&work) {
             for i in work {
                 solution += String(i);
@@ -90,6 +97,76 @@ class KillerSudokuSolver {
         else if (sum + MAX[empty] < block.target) {
             return false;
         }
+        return true
+    }
+    func splitBlocks() {
+        // For any group of cells with a known total (row, column, square or multiples thereof)
+        // we can try to remove all blocks wholly contained in that group. If the remaining cells
+        // belong to a single block then we know the subtotal for those cells so we can split the
+        // block into two smaller blocks, one inside the group and one outside. In the best case,
+        // one or other block will be a single cell and we will have fixed its value. In any case
+        // smaller blocks are more efficient since they have fewer options to search.
+        while (splitBlocksRecurse()) {
+        }
+    }
+    
+    func splitBlocksRecurse() -> Bool {
+        for i in 1...4 {
+            for base in stride(from:0, to:81 - 9 * i, by:9) {
+                let row = [Int](base...base + 9 * i - 1)
+                if (splitBlocks(row)) {
+                    return true
+                }
+            }
+        }
+        for i in 0...8 {
+            let col = [Int](stride(from: i, to:81, by:9))
+            if splitBlocks(col) {
+                return true
+            }
+        }
+        for i in 0...2 {
+            for j in 0...2 {
+                let base = 27 * i + 3 * j
+                let square = [base, base + 1, base + 2, base + 9, base + 10, base + 11, base + 18, base + 19, base + 20]
+                if splitBlocks(square) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    func splitBlocks(_ set:[Int]) -> Bool {
+        var work = Set(set)
+        var target = set.count * 5
+        for b in board.blocks {
+            if (work.isSuperset(of: b.cells)) {
+                for c in b.cells {
+                    work.remove(c)
+                }
+                target -= b.target
+            }
+        }
+        var remaining = Set<KillerSudokuBoard.Block>()
+        for i in work {
+            remaining.insert(board.block(at: i))
+        }
+        if (remaining.count != 1) {
+            return false
+        }
+        let oldBlock  = remaining.first!
+        let newBlock1 = KillerSudokuBoard.Block(target: target, cells: Array(work))
+        var newBlock2Cells:[Int] = []
+        for c in oldBlock.cells {
+            if (!(work.contains(c))) {
+                newBlock2Cells.append(c)
+            }
+        }
+        let newBlock2 = KillerSudokuBoard.Block(target: oldBlock.target - target, cells: newBlock2Cells)
+        board.addBlock(block: newBlock1)
+        board.addBlock(block: newBlock2)
+        board.removeBlock(block: oldBlock)
         return true
     }
 }

@@ -9,17 +9,27 @@
 import Foundation
 
 class KillerSudokuBoard {
-    class Block {
+    class Block : Hashable {
+        static func == (lhs: KillerSudokuBoard.Block, rhs: KillerSudokuBoard.Block) -> Bool {
+            return lhs.target == rhs.target && lhs.cells == rhs.cells
+        }
+        
         init (target:Int, cells:[Int]) {
             self.target = target
             self.cells = cells
+        }
+        
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(target)
+            hasher.combine(cells)
         }
         
         let target:Int
         let cells:[Int]
     }
 
-    private var blocks:[Block] = []
+    var blocks:[Block] = []
     private var blockIndex:[Block] = []
     
     init() {
@@ -28,6 +38,13 @@ class KillerSudokuBoard {
     func addBlock(block:Block) {
         blocks.append(block)
         blockIndex = []
+    }
+    
+    func removeBlock(block:Block) {
+        if let index = blocks.firstIndex(of: block) {
+            blocks.remove(at: index)
+            blockIndex = []
+        }
     }
     
     func block(at:Int) -> Block {

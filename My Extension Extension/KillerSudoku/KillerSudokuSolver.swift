@@ -13,6 +13,8 @@ class KillerSudokuSolver {
     var solution:String
     let MAX = [0, 9, 17, 24, 30, 35, 39, 42, 44, 45]
     let MIN = [0, 1,  3,  6, 10, 15, 21, 28, 36, 45]
+    var auxBlocks:[KillerSudokuBoard.Block] = []
+    var auxBlockIndex:[[KillerSudokuBoard.Block]] = []
     
     init(board:KillerSudokuBoard) {
         self.board = board
@@ -80,16 +82,24 @@ class KillerSudokuSolver {
         let block = board.block(at:at);
         var sum = value
         var empty = -1
+        var used:[Bool] = Array.init(repeating: false, count: 9)
+        
         for i in block.cells {
             if (work[i] == 0) {
                 empty += 1
             }
             else {
+                if (used[work[i] - 1]) {
+                    return false
+                }
+                used[work[i] - 1] = true
                 sum += work[i]
             }
         }
         if (0 == empty) {
-            return sum == block.target
+            if (sum != block.target) {
+                return false
+            }
         }
         else if (block.target <= sum){
             return false;
@@ -97,8 +107,33 @@ class KillerSudokuSolver {
         else if (sum + MAX[empty] < block.target) {
             return false;
         }
+        for b in auxBlockIndex[at] {
+            var sum = value
+            var empty = -1
+            
+            for c in b.cells {
+                if (work[c] == 0) {
+                    empty += 1
+                }
+                else {
+                    sum += work[c]
+                }
+            }
+            if (0 == empty) {
+                if (sum != b.target) {
+                    return false
+                }
+            }
+            else if (b.target <= sum){
+                return false;
+            }
+            else if (sum + 9 * empty < b.target) {
+                return false;
+            }
+        }
         return true
     }
+    
     func splitBlocks() {
         // For any group of cells with a known total (row, column, square or multiples thereof)
         // we can try to remove all blocks wholly contained in that group. If the remaining cells
@@ -106,12 +141,16 @@ class KillerSudokuSolver {
         // block into two smaller blocks, one inside the group and one outside. In the best case,
         // one or other block will be a single cell and we will have fixed its value. In any case
         // smaller blocks are more efficient since they have fewer options to search.
+        // If the remaining cells don't belong to a single block then we can create an 'auxiliary'
+        // block for them since we know their total. Aux blocks can be useful for testing whether
+        // positions are valid.
         while (splitBlocksRecurse()) {
         }
+        createAuxBlockIndex()
     }
     
     func splitBlocksRecurse() -> Bool {
-        for i in 1...4 {
+        for i in 1...8 {
             for base in stride(from:0, to:81 - 9 * i, by:9) {
                 let row = [Int](base...base + 9 * i - 1)
                 if (splitBlocks(row)) {
@@ -119,10 +158,17 @@ class KillerSudokuSolver {
                 }
             }
         }
+        var cols:[[Int]] = []
         for i in 0...8 {
-            let col = [Int](stride(from: i, to:81, by:9))
-            if splitBlocks(col) {
-                return true
+            cols.append([Int](stride(from: i, to:81, by:9)))
+        }
+        for base in 0...8 {
+            var set:[Int] = []
+            for i in 1...min(8, 9 - base) {
+                set = set + cols[base + i - 1]
+                if (splitBlocks(set)) {
+                    return true
+                }
             }
         }
         for i in 0...2 {
@@ -148,11 +194,22 @@ class KillerSudokuSolver {
                 target -= b.target
             }
         }
+        for b in auxBlocks {
+            if (work.isSuperset(of: b.cells)) {
+                for c in b.cells {
+                    work.remove(c)
+                }
+                target -= b.target
+            }
+        }
         var remaining = Set<KillerSudokuBoard.Block>()
         for i in work {
             remaining.insert(board.block(at: i))
         }
-        if (remaining.count != 1) {
+        if (1 < remaining.count) {
+            return auxSplitBlocks(work, target)
+        }
+        else if (0 == remaining.count) {
             return false
         }
         let oldBlock  = remaining.first!
@@ -168,5 +225,23 @@ class KillerSudokuSolver {
         board.addBlock(block: newBlock2)
         board.removeBlock(block: oldBlock)
         return true
+    }
+    
+    private func auxSplitBlocks(_ work:Set<Int>, _ target:Int) -> Bool {
+        let newBlock:KillerSudokuBoard.Block = KillerSudokuBoard.Block(target:target, cells:Array(work))
+        if (auxBlocks.contains(newBlock)) {
+            return false
+        }
+        auxBlocks.append(newBlock)
+        return true
+    }
+    
+    private func createAuxBlockIndex() {
+        auxBlockIndex = Array.init(repeating: [], count: 81)
+        for b in auxBlocks {
+            for c in b.cells {
+                auxBlockIndex[c].append(b)
+            }
+        }
     }
 }

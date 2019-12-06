@@ -15,6 +15,7 @@ class KillerSudokuSolver {
     let MIN = [0, 1,  3,  6, 10, 15, 21, 28, 36, 45]
     var auxBlocks:[KillerSudokuBoard.Block] = []
     var auxBlockIndex:[[KillerSudokuBoard.Block]] = []
+    var candidates:[Set<Int>] = []
     
     init(board:KillerSudokuBoard) {
         self.board = board
@@ -24,9 +25,10 @@ class KillerSudokuSolver {
     func solve() -> Bool {
         var work = Array(repeating: 0, count: 81);
         splitBlocks()
-        for b in board.blocks {
-            if (b.cells.count == 1) {
-                work[b.cells[0]] = b.target
+        buildCandidates()
+        for i in 0...80 {
+            if (candidates[i].count == 1) {
+                work[i] = candidates[i].first!
             }
         }
         if solveRecurse(work:&work) {
@@ -41,7 +43,7 @@ class KillerSudokuSolver {
     func solveRecurse(work:inout [Int]) -> Bool {
         for i in 0...80 {
             if (work[i] == 0) {
-                for j in 1...9 {
+                for j in candidates[i] {
                     if (isValid(work:work, at:i, value:j)) {
                         work[i] = j;
                         if (solveRecurse(work:&work)) {
@@ -241,6 +243,51 @@ class KillerSudokuSolver {
         for b in auxBlocks {
             for c in b.cells {
                 auxBlockIndex[c].append(b)
+            }
+        }
+    }
+    
+    private func buildCandidates() {
+        candidates = Array.init(repeating: Set(1...9), count: 81)
+        for b in board.blocks {
+            if b.cells.count == 1 {
+                candidates[b.cells[0]] = Set([b.target])
+            }
+        }
+        var recheck:Bool = true
+        while (recheck) {
+            recheck = false
+            for b in board.blocks {
+                if b.cells.count == 2 {
+                    for i in candidates[b.cells[0]] {
+                        if (!candidates[b.cells[1]].contains(b.target - i) || (b.target - i == i)) {
+                            recheck = true
+                            candidates[b.cells[0]].remove(i)
+                        }
+                    }
+                    for i in candidates[b.cells[1]] {
+                        if (!candidates[b.cells[0]].contains(b.target - i)) {
+                            recheck = true
+                            candidates[b.cells[1]].remove(i)
+                        }
+                    }
+                }
+            }
+            for b in auxBlocks {
+                if b.cells.count == 2 {
+                    for i in candidates[b.cells[0]] {
+                        if (!candidates[b.cells[1]].contains(b.target - i)) {
+                            recheck = true
+                            candidates[b.cells[0]].remove(i)
+                        }
+                    }
+                    for i in candidates[b.cells[1]] {
+                        if (!candidates[b.cells[0]].contains(b.target - i)) {
+                            recheck = true
+                            candidates[b.cells[1]].remove(i)
+                        }
+                    }
+                }
             }
         }
     }

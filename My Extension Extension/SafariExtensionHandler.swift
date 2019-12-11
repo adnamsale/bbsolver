@@ -16,7 +16,7 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
         page.getPropertiesWithCompletionHandler { properties in
             NSLog("The extension received a new message (\(messageName)) from a script injected into (\(String(describing: properties?.url))) with userInfo (\(userInfo ?? [:]))")
             if (!messageName.starts(with: "Null")) {
-                let solution = self.solve(source: messageName)
+                let solution = self.solve(source: messageName, userInfo: userInfo!)
                 page.dispatchMessageToScript(withName: "simpleMessage", userInfo: solution)
             }
         }
@@ -25,7 +25,12 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
     
     override func toolbarItemClicked(in window: SFSafariWindow) {
         // This method will be called when your toolbar item is clicked.
-        NSLog("The extension's toolbar item was Mondayed")
+        NSLog("The extension's toolbar item was Wednesdayed")
+        window.getActiveTab { (tab:SFSafariTab?) in
+            tab?.getActivePage(completionHandler: { (page:SFSafariPage?) in
+                page?.dispatchMessageToScript(withName: "simpleMessage", userInfo: ["type":"Button"])
+            })
+        }
     }
     
     override func validateToolbarItem(in window: SFSafariWindow, validationHandler: @escaping ((Bool, String) -> Void)) {
@@ -37,16 +42,46 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
         return SafariExtensionViewController.shared
     }
 
-    private func solve(source:String) -> [String:Any]{
+    private func solve(source:String, userInfo:[String:Any]) -> [String:Any]{
         var answer:[String:Any] = [String:Any]()
-        let parser = KillerSudokuBoardParser(source:source)
-        let board = parser.parsed;
-        let solver = KillerSudokuSolver(board:board)
-        if (solver.solve()) {
-            answer["solution"] = solver.solution
-        }
-        else {
-            answer["error"] = "No solution found"
+        let type = userInfo["type"] as! String
+        let source = userInfo["source"] as! String
+        switch(type) {
+        case "KillerSudoku":
+            let parser = KillerSudokuBoardParser(source:source)
+            let board = parser.parsed
+            let solver = KillerSudokuSolver(board:board)
+            if (solver.solve()) {
+                answer["type"] = "Sudoku"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for Killer Sudoku"
+            }
+        case "Sudoku":
+            let parser = SudokuBoardParser(source:source)
+            let board = parser.parsed
+            let solver = SudokuSolver(board:board)
+            if (solver.solve()) {
+                answer["type"] = "Sudoku"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for Sudoku"
+            }
+        case "Slitherlink":
+            let parser = SlitherlinkBoardParser(source:source)
+            let board = parser.parsed
+            let solver = SlitherlinkSolver(board:board)
+            if (solver.solve()) {
+                answer["type"] = "Slitherlink"
+                answer["solution"] = ["hor":solver.solution["hor"], "ver":solver.solution["ver"]]
+            }
+            else {
+                answer["error"] = "No solution found for Slitherlink"
+            }
+        default:
+            answer["error"] = "Unknown type: \(type)"
         }
         return answer;
     }    

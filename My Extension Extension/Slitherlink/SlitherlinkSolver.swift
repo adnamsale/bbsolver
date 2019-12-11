@@ -78,6 +78,7 @@ class SlitherlinkMove {
 class SlitherlinkSolver {
     let board:SlitherlinkBoard
     let dim:Int
+    var solution:[String:String] = [:]
     
     init(board:SlitherlinkBoard) {
         self.board = board
@@ -129,6 +130,41 @@ class SlitherlinkSolver {
         let state = SlitherlinkState(dim)
         if solveRecurse(state) {
             dumpState(board, state)
+            var hor:String = ""
+            for i in 0...dim {
+                for j in 1...dim {
+                    var c:String
+                    if (state.hor[i][j] == true) {
+                        c = "y"
+                    }
+                    else if (state.hor[i][j] == false) {
+                        c = "x"
+                    }
+                    else {
+                        c = "n"
+                    }
+                    hor = hor + c
+                }
+            }
+            solution["hor"] = hor
+            var ver:String = ""
+            for j in 1...dim {
+                for i in 0...dim {
+                    var c:String
+                    if (state.ver[i][j] == true) {
+                        c = "y"
+                    }
+                    else if (state.ver[i][j] == false) {
+                        c = "x"
+                    }
+                    else {
+                        c = "n"
+                    }
+                    ver = ver + c
+                }
+            }
+            solution["ver"] = ver
+            
             return true
         }
         return false

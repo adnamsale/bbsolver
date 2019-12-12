@@ -28,24 +28,6 @@ class SlitherlinkState {
         }
     }
     
-    @discardableResult
-    func setHorIfNil(_ i:Int, _ j:Int, _ value:Bool) -> Bool {
-        if (hor[i][j] == nil) {
-            hor[i][j] = value
-            return true
-        }
-        return false
-    }
-    
-    @discardableResult
-    func setVerIfNil(_ i:Int, _ j:Int, _ value:Bool) -> Bool {
-        if (ver[i][j] == nil) {
-            ver[i][j] = value
-            return true
-        }
-        return false
-    }
-    
     func set(_ dir:Direction, _ i:Int, _ j:Int, _ value:Bool?) {
         if (dir == Direction.HOR) {
             hor[i][j] = value
@@ -86,17 +68,22 @@ class SlitherlinkSolver {
     }
     
     func solve() -> Bool {
-//        logicSolve()
-        return searchSolve()
+        let state = SlitherlinkState(dim)
+        setPatterns(state)
+        dumpState(board, state)
+        return searchSolve(state)
     }
     
     private func dumpState(_ board:SlitherlinkBoard, _ state:SlitherlinkState) {
         for i in 0..<dim {
             var strSep:String = "+"
-            var strClue:String = state.ver[0][i + 1] == true ? "|" : " "
+            var strClue:String = state.ver[0][i + 1] == true ? "|" : state.ver[0][i + 1] == false ? "x": " "
             for j in 0..<dim {
                 if state.hor[i][j + 1] == true {
                     strSep = strSep + "-"
+                }
+                else if state.hor[i][j + 1] == false {
+                    strSep = strSep + "x"
                 }
                 else {
                     strSep = strSep + " "
@@ -108,7 +95,7 @@ class SlitherlinkSolver {
                     strClue += " "
                 }
                 strSep += "+"
-                strClue += state.ver[j + 1][i + 1] == true ? "|" : " "
+                strClue += state.ver[j + 1][i + 1] == true ? "|" : state.ver[j + 1][i + 1] == false ? "x": " "
             }
             NSLog(strSep)
             NSLog(strClue)
@@ -118,6 +105,9 @@ class SlitherlinkSolver {
             if state.hor[dim][j + 1] == true {
                 strSep = strSep + "-"
             }
+            else if state.hor[dim][j + 1] == false {
+                strSep = strSep + "x"
+            }
             else {
                 strSep = strSep + " "
             }
@@ -126,8 +116,7 @@ class SlitherlinkSolver {
         NSLog(strSep)
     }
     
-    private func searchSolve() -> Bool {
-        let state = SlitherlinkState(dim)
+    private func searchSolve(_ state:SlitherlinkState) -> Bool {
         if solveRecurse(state) {
             dumpState(board, state)
             var hor:String = ""
@@ -234,32 +223,10 @@ class SlitherlinkSolver {
                         return nil
                     }
                     if falseCount + clue == 4 && trueCount < clue {
-                        if nil == state.hor[i][j + 1] {
-                            answer.append(SlitherlinkMove(Direction.HOR, i, j + 1, true))
-                        }
-                        if nil == state.hor[i + 1][j + 1] {
-                            answer.append(SlitherlinkMove(Direction.HOR, i + 1, j + 1, true))
-                        }
-                        if nil == state.ver[j][i + 1] {
-                            answer.append(SlitherlinkMove(Direction.VER, j, i + 1, true))
-                        }
-                        if nil == state.ver[j + 1][i + 1] {
-                            answer.append(SlitherlinkMove(Direction.VER, j + 1, i + 1, true))
-                        }
+                        fillCell(state, i, j, true, &answer)
                     }
                     if trueCount == clue && falseCount < 4 - clue {
-                        if nil == state.hor[i][j + 1] {
-                            answer.append(SlitherlinkMove(Direction.HOR, i, j + 1, false))
-                        }
-                        if nil == state.hor[i + 1][j + 1] {
-                            answer.append(SlitherlinkMove(Direction.HOR, i + 1, j + 1, false))
-                        }
-                        if nil == state.ver[j][i + 1] {
-                            answer.append(SlitherlinkMove(Direction.VER, j, i + 1, false))
-                        }
-                        if nil == state.ver[j + 1][i + 1] {
-                            answer.append(SlitherlinkMove(Direction.VER, j + 1, i + 1, false))
-                        }
+                        fillCell(state, i, j, false, &answer);
                     }
                 }
             }
@@ -283,9 +250,29 @@ class SlitherlinkSolver {
                         fillNode(state, i, j, false, &answer)
                     }
                 }
+                else if (2 == falseCount) {
+                    if (1 == trueCount) {
+                        fillNode(state, i, j, true, &answer)
+                    }
+                }
             }
         }
         return answer
+    }
+    
+    private func fillCell(_ state:SlitherlinkState, _ i:Int, _ j:Int, _ value:Bool, _ moves:inout [SlitherlinkMove]) {
+        if nil == state.hor[i][j + 1] {
+            moves.append(SlitherlinkMove(Direction.HOR, i, j + 1, value))
+        }
+        if nil == state.hor[i + 1][j + 1] {
+            moves.append(SlitherlinkMove(Direction.HOR, i + 1, j + 1, value))
+        }
+        if nil == state.ver[j][i + 1] {
+            moves.append(SlitherlinkMove(Direction.VER, j, i + 1, value))
+        }
+        if nil == state.ver[j + 1][i + 1] {
+            moves.append(SlitherlinkMove(Direction.VER, j + 1, i + 1, value))
+        }
     }
     
     private func fillNode(_ state:SlitherlinkState, _ i:Int,_ j:Int, _ value:Bool, _ moves:inout [SlitherlinkMove]) {
@@ -303,21 +290,7 @@ class SlitherlinkSolver {
         }
     }
     
-    private func logicSolve() {
-        let state = SlitherlinkState(dim)
-        
-        // Zeros
-        for i in 0..<board.dim {
-            for j in 0..<board.dim {
-                if (board.clue(i, j) == 0) {
-                    state.hor[i][j + 1] = false
-                    state.hor[i + 1][j + 1] = false
-                    state.ver[j][i + 1] = false
-                    state.ver[j + 1][i + 1] = false
-                }
-            }
-        }
-        
+    private func setPatterns(_ state:SlitherlinkState) {
         // Corners
         switch board.clue(0,0) {
         case 1:
@@ -383,41 +356,66 @@ class SlitherlinkSolver {
         default:
             break
         }
-        while (logicSolveRecurse(state)) {
-        }
-    }
-    
-    private func logicSolveRecurse(_ state:SlitherlinkState) -> Bool {
-        if propagateDeadEnds(state) {
-            return true
-        }
-        if fillClues(state) {
-            return true
-        }
-        if propagateCorners(state) {
-            return true
-        }
-        if extendLine(state) {
-            return true
-        }
-        return false;
-    }
-    
-    // If an intersection has 3 false paths then the 4th path can be set to false
-    private func propagateDeadEnds(_ state:SlitherlinkState) -> Bool {
-        for row in 0...dim {
-            for col in 0...dim {
-                let countFalse = countNode(state, row, col, false)
-                if (3 == countFalse) {
-                    state.hor[row][col] = false
-                    state.hor[row][col + 1] = false
-                    state.ver[col][row] = false
-                    state.ver[col][row + 1] = false
-                    return true
+        // Adjacent 3s
+        for i in 0..<dim - 1 {
+            for j in 0..<dim {
+                if board.clue(i, j) == 3 && board.clue(i + 1, j) == 3 {
+                    state.hor[i][j + 1] = true
+                    state.hor[i + 1][j + 1] = true
+                    state.hor[i + 2][j + 1] = true
+                    state.hor[i + 1][j] = false
+                    state.hor[i + 1][j + 2] = false
                 }
             }
         }
-        return false
+        for i in 0..<dim {
+            for j in 0..<dim - 1 {
+                if board.clue(i, j) == 3 && board.clue(i, j + 1) == 3 {
+                    state.ver[j][i + 1] = true
+                    state.ver[j + 1][i + 1] = true
+                    state.ver[j + 2][i + 1] = true
+                    state.ver[j + 1][i] = false
+                    state.ver[j + 1][i + 2] = false
+                }
+            }
+        }
+        // Diagonal 3s
+        for i in 0..<dim - 1 {
+            for j in 0..<dim - 1 {
+                if board.clue(i,j) == 3 {
+                    var i1 = i + 1
+                    var j1 = j + 1
+                    while (i1 < dim && j1 < dim && board.clue(i1, j1) == 2) {
+                        i1 = i1 + 1
+                        j1 = j1 + 1
+                    }
+                    if (i1 < dim && j1 < dim && board.clue(i1, j1) == 3) {
+                        state.hor[i][j + 1] = true
+                        state.hor[i1 + 1][j1 + 1] = true
+                        state.ver[j][i + 1] = true
+                        state.ver[j1 + 1][i1 + 1] = true
+                    }
+                }
+            }
+        }
+        for i in 0..<dim - 1 {
+            for j in 1..<dim {
+                if board.clue(i, j) == 3 {
+                    var i1 = i + 1
+                    var j1 = j - 1
+                    while (i1 < dim && 0 <= j1 && board.clue(i1, j1) == 2) {
+                        i1 = i1 + 1
+                        j1 = j1 - 1
+                    }
+                    if (i1 < dim && 0 <= j1 && board.clue(i1, j1) == 3) {
+                        state.hor[i][j + 1] = true
+                        state.hor[i1 + 1][j1 + 1] = true
+                        state.ver[j + 1][i + 1] = true
+                        state.ver[j1][i1 + 1] = true
+                    }
+                }
+            }
+        }
     }
     
     private func countNode(_ state:SlitherlinkState, _ i:Int, _ j:Int, _ value:Bool) -> Int {
@@ -452,86 +450,5 @@ class SlitherlinkSolver {
             count += 1
         }
         return count
-    }
-    
-    // If we have enough false entries around a clue square, we can fill in the trues
-    // E.g., if the clue is 3 and we have one false then we know the others must be true
-    private func fillClues(_ state:SlitherlinkState) -> Bool {
-        for i in 0..<dim {
-            for j in 0..<dim {
-                if let clue = board.clue(i, j) {
-                    let countFalse = countBorder(state, i, j, false)
-                    let countTrue = countBorder(state, i, j, true)
-                    if (countFalse + clue == 4 && clue != countTrue) {
-                        state.setHorIfNil(i, j + 1, true)
-                        state.setHorIfNil(i + 1, j + 1, true)
-                        state.setVerIfNil(j, i + 1, true)
-                        state.setVerIfNil(j + 1, i + 1, true)
-                        return true
-                    }
-                    else if (countFalse + clue != 4 && clue == countTrue) {
-                        state.setHorIfNil(i, j + 1, false)
-                        state.setHorIfNil(i + 1, j + 1, false)
-                        state.setVerIfNil(j, i + 1, false)
-                        state.setVerIfNil(j + 1, i + 1, false)
-                        return true
-                    }
-                }
-            }
-        }
-        return false
-    }
-    
-    private func propagateCorners(_ state:SlitherlinkState) -> Bool {
-        for row in 0...dim {
-            for col in 0...dim {
-                if (state.ver[col][row] == true && state.hor[row][col + 1] == true) {
-                    var answer = state.setHorIfNil(row, col, false)
-                    answer = state.setVerIfNil(col, row + 1, false) || answer
-                    if (answer) {
-                        return true
-                    }
-                }
-                if (state.hor[row][col + 1] == true && state.ver[col][row + 1] == true) {
-                    var answer = state.setHorIfNil(row, col, false)
-                    answer = state.setVerIfNil(col, row, false) || answer
-                    if (answer) {
-                        return true
-                    }
-                }
-                if (state.ver[col][row + 1] == true && state.hor[row][col] == true) {
-                    var answer = state.setHorIfNil(row, col + 1, false)
-                    answer = state.setVerIfNil(col, row, false) || answer
-                    if (answer) {
-                        return true
-                    }
-                }
-                if (state.hor[row][col] == true && state.ver[col][row] == true) {
-                    var answer = state.setHorIfNil(row, col + 1, false)
-                    answer = state.setVerIfNil(col, row + 1, false) || answer
-                    if (answer) {
-                        return true
-                    }
-                }
-            }
-        }
-        return false
-    }
-    
-    private func extendLine(_ state: SlitherlinkState) -> Bool {
-        for row in 0...dim {
-            for col in 0...dim {
-                let countFalse = countNode(state, row, col, false)
-                let countTrue = countNode(state, row, col, true)
-                if (2 == countFalse && 1 == countTrue) {
-                    state.setHorIfNil(row, col, true)
-                    state.setHorIfNil(row, col + 1, true)
-                    state.setVerIfNil(col, row, true)
-                    state.setVerIfNil(col, row + 1, true)
-                    return true
-                }
-            }
-        }
-        return false
     }
 }

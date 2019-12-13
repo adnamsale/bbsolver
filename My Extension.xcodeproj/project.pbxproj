@@ -23,6 +23,7 @@
 		4D0DD147237B789500A11F8D /* BoardParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0DD146237B789500A11F8D /* BoardParserTests.swift */; };
 		4D0DD151237C7CDB00A11F8D /* SudokuBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0DD143237B748B00A11F8D /* SudokuBoardParser.swift */; };
 		4D0DD153237CCF7900A11F8D /* SudokuSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0DD152237CCF7900A11F8D /* SudokuSolver.swift */; };
+		4D1814F523A2FF8F002E6385 /* SlitherlinkSolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1814F423A2FF8F002E6385 /* SlitherlinkSolverTests.swift */; };
 		4D78C5B7238DF3C10032456A /* SlitherlinkBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5B6238DF3C10032456A /* SlitherlinkBoard.swift */; };
 		4D78C5B9238DF4370032456A /* SlitherlinkBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5B8238DF4370032456A /* SlitherlinkBoardParser.swift */; };
 		4D78C5BC238EF9E00032456A /* SlitherlinkBoardParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */; };
@@ -101,6 +102,7 @@
 		4D0DD143237B748B00A11F8D /* SudokuBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudokuBoardParser.swift; sourceTree = "<group>"; };
 		4D0DD146237B789500A11F8D /* BoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardParserTests.swift; sourceTree = "<group>"; };
 		4D0DD152237CCF7900A11F8D /* SudokuSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudokuSolver.swift; sourceTree = "<group>"; };
+		4D1814F423A2FF8F002E6385 /* SlitherlinkSolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkSolverTests.swift; sourceTree = "<group>"; };
 		4D78C5B6238DF3C10032456A /* SlitherlinkBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoard.swift; sourceTree = "<group>"; };
 		4D78C5B8238DF4370032456A /* SlitherlinkBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoardParser.swift; sourceTree = "<group>"; };
 		4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoardParserTests.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			isa = PBXGroup;
 			children = (
 				4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */,
+				4D1814F423A2FF8F002E6385 /* SlitherlinkSolverTests.swift */,
 			);
 			path = Slitherlink;
 			sourceTree = "<group>";
@@ -416,6 +419,7 @@
 				4DB6D90C237DE663004B292E /* SudokuSolver.swift in Sources */,
 				4DB6D90B237DE617004B292E /* SolverTests.swift in Sources */,
 				4D78C5BC238EF9E00032456A /* SlitherlinkBoardParserTests.swift in Sources */,
+				4D1814F523A2FF8F002E6385 /* SlitherlinkSolverTests.swift in Sources */,
 				4DB6D919237F4D6D004B292E /* KillerSudokuBoardParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

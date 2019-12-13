@@ -164,6 +164,13 @@ class SlitherlinkSolver {
             if 0 != moves.count {
                 for move in moves {
                     state.set(move.dir, move.i, move.j, move.value)
+                    // If we close a loop then back out the moves and return
+                    if move.value == true && !checkLoop(state, move.dir, move.i, move.j) {
+                        for move2 in moves {
+                            state.set(move2.dir, move2.i, move2.j, nil)
+                        }
+                        return false
+                    }
                 }
                 let answer = solveRecurse(state)
                 if (!answer) {
@@ -182,7 +189,7 @@ class SlitherlinkSolver {
             for j in 1...dim {
                 if (state.hor[i][j] == nil) {
                     state.hor[i][j] = true
-                    if solveRecurse(state) {
+                    if checkLoop(state, Direction.HOR, i, j) && solveRecurse(state) {
                         return true
                     }
                     state.hor[i][j] = false
@@ -194,7 +201,7 @@ class SlitherlinkSolver {
                 }
                 if (state.ver[i][j] == nil) {
                     state.ver[i][j] = true
-                    if solveRecurse(state) {
+                    if checkLoop(state, Direction.VER, i, j) && solveRecurse(state) {
                         return true
                     }
                     state.ver[i][j] = false
@@ -202,6 +209,93 @@ class SlitherlinkSolver {
                         return true
                     }
                     state.ver[i][j] = nil
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
+    private func checkLoop(_ state:SlitherlinkState, _ dir:Direction, _ i:Int, _ j:Int) -> Bool {
+        if (dir == Direction.HOR) {
+            // The move connects nodes (i, j-1) and (i,j)
+            let trueCount1 = countNode(state, i, j - 1, true)
+            let trueCount2 = countNode(state, i, j, true)
+            // We're only closing a loop if both counts are 2
+            if trueCount1 != 2 || trueCount2 != 2 {
+                return true
+            }
+        }
+        else {
+            // The move connects nodes (j - 1, i) and (j, i)
+            let trueCount1 = countNode(state, j - 1, i, true)
+            let trueCount2 = countNode(state, j, i, true)
+            // We're only closing a loop if both counts are 2
+            if trueCount1 != 2 || trueCount2 != 2 {
+                return true
+            }
+        }
+        var pos1:(Int, Int)
+        var pos2:(Int, Int)
+        if (dir == Direction.HOR) {
+            // If we embed the board in a (dim + 2)/(dim + 2) array with a 1 cell border round the outside,
+            // the move separates cells (i,j) and (i+1,j)
+            pos1 = (i, j)
+            pos2 = (i + 1, j)
+        }
+        else {
+            pos1 = (j, i)
+            pos2 = (j, i + 1)
+        }
+        var reachable:[[Bool]] = Array.init(repeating: Array.init(repeating:false, count: dim + 2), count: dim + 2)
+        reachable[pos1.0][pos1.1] = true
+        var todo:[(Int, Int)] = []
+        todo.append(pos1)
+        while 0 != todo.count {
+            let (iCur, jCur) = todo.removeLast()
+            if iCur <= dim && state.hor[iCur][jCur] != true {
+                if !reachable[iCur + 1][jCur] {
+                    reachable[iCur + 1][jCur] = true
+                    todo.append((iCur + 1, jCur))
+                }
+            }
+            if 0 < iCur && state.hor[iCur - 1][jCur] != true {
+                if !reachable[iCur - 1][jCur] {
+                    reachable[iCur - 1][jCur] = true
+                    todo.append((iCur - 1, jCur))
+                }
+            }
+            if jCur <= dim && state.ver[jCur][iCur] != true {
+                if !reachable[iCur][jCur + 1] {
+                    reachable[iCur][jCur + 1] = true
+                    todo.append((iCur, jCur + 1))
+                }
+            }
+            if 0 < jCur && state.ver[jCur - 1][iCur] != true {
+                if !reachable[iCur][jCur - 1] {
+                    reachable[iCur][jCur - 1] = true
+                    todo.append((iCur, jCur - 1))
+                }
+            }
+            if (reachable[pos2.0][pos2.1]) {
+                return true
+            }
+        }
+        // So we do have an island. At this point, if all clues are satifisfied and we have a continuous path then we're done, otherwise the position is invalid
+        for i in 0..<dim {
+            for j in 0..<dim {
+                if let clue = board.clue(i, j) {
+                    let trueCount = countBorder(state, i, j, true)
+                    if clue != trueCount {
+                        return false
+                    }
+                }
+            }
+        }
+        for i in 0...dim {
+            for j in 0...dim {
+                let trueCount = countNode(state, i, j, true)
+                if 0 != trueCount && 2 != trueCount {
                     return false
                 }
             }

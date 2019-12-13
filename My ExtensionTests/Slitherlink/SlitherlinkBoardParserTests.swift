@@ -25,7 +25,7 @@ class SlitherlinkBoardParserTests: XCTestCase {
         let parser = SlitherlinkBoardParser(source: source);
         let check = parser.parsed;
         let solver = SlitherlinkSolver(board:check)
-        solver.solve()
+        XCTAssert(solver.solve())
     }
     
     func testReal2() {

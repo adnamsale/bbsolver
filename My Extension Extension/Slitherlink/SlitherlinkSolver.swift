@@ -28,12 +28,36 @@ class SlitherlinkState {
         }
     }
     
-    func set(_ dir:Direction, _ i:Int, _ j:Int, _ value:Bool?) {
-        if (dir == Direction.HOR) {
+    func set(_ dir:Direction, _ i:Int, _ j:Int, _ value:Bool) -> Bool {
+        let current:Bool?  = get(dir, i, j)
+        if current != nil && current != value {
+            return false
+        }
+        
+        if dir == Direction.HOR {
             hor[i][j] = value
         }
         else {
             ver[i][j] = value
+        }
+        return true
+    }
+    
+    func clear(_ dir:Direction, _ i:Int, _ j:Int) {
+        if dir == Direction.HOR {
+            hor[i][j] = nil
+        }
+        else {
+            ver[i][j] = nil
+        }
+    }
+    
+    func get(_ dir:Direction, _ i:Int, _ j:Int) -> Bool? {
+        if dir == Direction.HOR {
+            return hor[i][j]
+        }
+        else {
+            return ver[i][j]
         }
     }
 }
@@ -162,21 +186,13 @@ class SlitherlinkSolver {
     private func solveRecurse(_ state:SlitherlinkState) -> Bool {
         if let moves = findForcedMoves(state) {
             if 0 != moves.count {
-                for move in moves {
-                    state.set(move.dir, move.i, move.j, move.value)
-                    // If we close a loop then back out the moves and return
-                    if move.value == true && !checkLoop(state, move.dir, move.i, move.j) {
-                        for move2 in moves {
-                            state.set(move2.dir, move2.i, move2.j, nil)
-                        }
-                        return false
-                    }
+                if !applyMoves(state, moves) {
+                    rollbackMoves(state, moves)
+                    return false
                 }
                 let answer = solveRecurse(state)
                 if (!answer) {
-                    for move in moves {
-                        state.set(move.dir, move.i, move.j, nil)
-                    }
+                    rollbackMoves(state, moves)
                 }
                 return answer
             }
@@ -214,6 +230,25 @@ class SlitherlinkSolver {
             }
         }
         return true
+    }
+    
+    private func applyMoves(_ state:SlitherlinkState, _ moves:[SlitherlinkMove]) -> Bool {
+        for move in moves {
+            if !state.set(move.dir, move.i, move.j, move.value) {
+                return false
+            }
+            // If we close a loop then back out the moves and return
+            if move.value == true && !checkLoop(state, move.dir, move.i, move.j) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    private func rollbackMoves(_ state:SlitherlinkState, _ moves:[SlitherlinkMove]) {
+        for move in moves {
+            state.clear(move.dir, move.i, move.j)
+        }
     }
     
     private func checkLoop(_ state:SlitherlinkState, _ dir:Direction, _ i:Int, _ j:Int) -> Bool {
@@ -351,37 +386,131 @@ class SlitherlinkSolver {
                 }
             }
         }
+        // Special cases
+        handleLineIntoClueThree(state, &answer)
+        handleLineIntoClueOne(state, &answer)
         return answer
     }
     
-    private func fillCell(_ state:SlitherlinkState, _ i:Int, _ j:Int, _ value:Bool, _ moves:inout [SlitherlinkMove]) {
-        if nil == state.hor[i][j + 1] {
-            moves.append(SlitherlinkMove(Direction.HOR, i, j + 1, value))
-        }
-        if nil == state.hor[i + 1][j + 1] {
-            moves.append(SlitherlinkMove(Direction.HOR, i + 1, j + 1, value))
-        }
-        if nil == state.ver[j][i + 1] {
-            moves.append(SlitherlinkMove(Direction.VER, j, i + 1, value))
-        }
-        if nil == state.ver[j + 1][i + 1] {
-            moves.append(SlitherlinkMove(Direction.VER, j + 1, i + 1, value))
+    private func appendMove(_ state:SlitherlinkState, _ dir:Direction, _ i:Int, _ j:Int, _ value:Bool, _ answer:inout [SlitherlinkMove]) {
+        if (dir == Direction.HOR && nil == state.hor[i][j]) || (dir == Direction.VER && nil == state.ver[i][j]) {
+            answer.append(SlitherlinkMove(dir, i, j, value))
         }
     }
     
+    private func handleLineIntoClueOne(_ state:SlitherlinkState, _ answer:inout [SlitherlinkMove]) {
+        let value = false
+        let clue = 1
+        for i in 0..<dim {
+            for j in 0..<dim {
+                if board.clue(i, j) == clue {
+                    if state.hor[i][j] == true && state.ver[j][i] == false ||
+                        state.hor[i][j] == false && state.ver[j][i] == true {
+                        appendMove(state, Direction.HOR, i + 1, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j + 1, i + 1, value, &answer)
+                    }
+                    if state.hor[i][j + 2] == true && state.ver[j + 1][i] == false ||
+                        state.hor[i][j + 2] == false && state.ver[j + 1][i] == true{
+                        appendMove(state, Direction.HOR, i + 1, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j, i + 1, value, &answer)
+                    }
+                    if state.hor[i + 1][j] == true && state.ver[j][i + 2] == false ||
+                        state.hor[i + 1][j] == false && state.ver[j][i + 2] == true {
+                        appendMove(state, Direction.HOR, i, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j + 1, i + 1, value, &answer)
+                    }
+                    if state.hor[i + 1][j + 2] == true && state.ver[j + 1][i + 2] == false ||
+                        state.hor[i + 1][j + 2] == false && state.ver[j + 1][i + 2] == true {
+                        appendMove(state, Direction.HOR, i, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j, i + 1, value, &answer)
+                    }
+                }
+            }
+        }
+    }
+
+    private func handleLineIntoClueThree(_ state:SlitherlinkState, _ answer:inout [SlitherlinkMove]) {
+        let value = true
+        let clue = 3
+        for i in 0..<dim {
+            for j in 0..<dim {
+                if board.clue(i, j) == clue {
+                    if state.hor[i][j] == true || state.ver[j][i] == true {
+                        appendMove(state, Direction.HOR, i + 1, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j + 1, i + 1, value, &answer)
+                    }
+                    if state.hor[i][j + 2] == true || state.ver[j + 1][i] == true{
+                        appendMove(state, Direction.HOR, i + 1, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j, i + 1, value, &answer)
+                    }
+                    if state.hor[i + 1][j] == true || state.ver[j][i + 2] == true {
+                        appendMove(state, Direction.HOR, i, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j + 1, i + 1, value, &answer)
+                    }
+                    if state.hor[i + 1][j + 2] == true || state.ver[j + 1][i + 2] == true {
+                        appendMove(state, Direction.HOR, i, j + 1, value, &answer)
+                        appendMove(state, Direction.VER, j, i + 1, value, &answer)
+                    }
+                }
+            }
+        }
+    }
+
+    private func handleLineIntoClueTwo(_ state:SlitherlinkState, _ answer:inout [SlitherlinkMove]) {
+        let clue = 2
+        for i in 0..<dim {
+            for j in 0..<dim {
+                if board.clue(i, j) == clue {
+                    // Line coming in from top left
+                    if (state.hor[i][j] == true || state.ver[j][i] == true) &&
+                        (state.hor[i + 1][j + 1] == false || state.ver[j + 1][i + 1] == false) {
+                        mismatchPair(state, Direction.HOR, i, j, Direction.VER, j, i, &answer)
+                        mismatchPair(state, Direction.HOR, i + 1, j + 1, Direction.VER, j + 1, i + 1, &answer)
+                    }
+                    // Top right
+                    if (state.hor[i][j + 2] == true || state.ver[j + 1][i] == true) &&
+                        (state.hor[i + 1][j + 1] == false || state.ver[j][i + 1] == false) {
+                        mismatchPair(state, Direction.HOR, i, j + 2, Direction.VER, j + 1, i, &answer)
+                        mismatchPair(state, Direction.HOR, i + 1, j + 1, Direction.VER, j, i + 1, &answer)
+                    }
+                    // Bottom right
+                    if (state.hor[i + 1][j + 2] == true || state.ver[j + 1][i + 2] == true) &&
+                        (state.hor[i][j + 1] == false || state.ver[j][i + 1] == false) {
+                        mismatchPair(state, Direction.HOR, i + 1, j + 2, Direction.VER, j + 1, i + 2, &answer)
+                        mismatchPair(state, Direction.HOR, i, j + 1, Direction.VER, j, i + 1, &answer)
+                    }
+                    // Bottom left
+                    if (state.hor[i + 1][j] == true || state.ver[j][i + 2] == true) &&
+                        (state.hor[i][j + 1] == false || state.ver[j + 1][i + 1] == false) {
+                        mismatchPair(state, Direction.HOR, i + 1, j, Direction.VER, j, i + 2, &answer)
+                        mismatchPair(state, Direction.HOR, i, j + 1, Direction.VER, j + 1, i + 1, &answer)
+                    }
+                }
+            }
+        }
+    }
+
+    private func mismatchPair(_ state:SlitherlinkState, _ dir1:Direction, _ i1:Int, _ j1:Int, _ dir2:Direction, _ i2:Int, _ j2:Int, _ moves:inout [SlitherlinkMove]) {
+        if let current1 = state.get(dir1, i1, j2) {
+            appendMove(state, dir2, i2, j2, !current1, &moves)
+        }
+        else {
+            appendMove(state, dir1, i1, j1, !state.get(dir2, i2, j2)!, &moves)
+        }
+    }
+    
+    private func fillCell(_ state:SlitherlinkState, _ i:Int, _ j:Int, _ value:Bool, _ moves:inout [SlitherlinkMove]) {
+        appendMove(state, Direction.HOR, i, j + 1, value, &moves)
+        appendMove(state, Direction.HOR, i + 1, j + 1, value, &moves)
+        appendMove(state, Direction.VER, j, i + 1, value, &moves)
+        appendMove(state, Direction.VER, j + 1, i + 1, value, &moves)
+    }
+    
     private func fillNode(_ state:SlitherlinkState, _ i:Int,_ j:Int, _ value:Bool, _ moves:inout [SlitherlinkMove]) {
-        if (state.hor[i][j] == nil) {
-            moves.append(SlitherlinkMove(Direction.HOR, i, j, value))
-        }
-        else if (state.hor[i][j + 1] == nil) {
-            moves.append(SlitherlinkMove(Direction.HOR, i, j + 1, value))
-        }
-        else if (state.ver[j][i] == nil) {
-            moves.append(SlitherlinkMove(Direction.VER, j, i, value))
-        }
-        else if (state.ver[j][i + 1] == nil) {
-            moves.append(SlitherlinkMove(Direction.VER, j, i + 1, value))
-        }
+        appendMove(state, Direction.HOR, i, j, value, &moves)
+        appendMove(state, Direction.HOR, i, j + 1, value, &moves)
+        appendMove(state, Direction.VER, j, i, value, &moves)
+        appendMove(state, Direction.VER, j, i + 1, value, &moves)
     }
     
     private func setPatterns(_ state:SlitherlinkState) {

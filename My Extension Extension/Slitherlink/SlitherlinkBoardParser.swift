@@ -24,7 +24,6 @@ public class SlitherlinkBoardParser : NSObject, XMLParserDelegate {
     private func parse() -> SlitherlinkBoard {
         let regex = try! NSRegularExpression(pattern:#"(<img[^>]+)>"#, options:[])
         let fixedSource = regex.stringByReplacingMatches(in: source, options: [], range: NSMakeRange(0, source.count), withTemplate: "$1/>")
-//        let fixedSource = source.replacingOccurrences(of: "\"></", with:"\"/></");
         let parser = XMLParser(data: fixedSource.data(using: .utf8) ?? Data())
         parser.delegate = self;
         parser.parse();

@@ -24,6 +24,13 @@
 		4D0DD151237C7CDB00A11F8D /* SudokuBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0DD143237B748B00A11F8D /* SudokuBoardParser.swift */; };
 		4D0DD153237CCF7900A11F8D /* SudokuSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0DD152237CCF7900A11F8D /* SudokuSolver.swift */; };
 		4D1814F523A2FF8F002E6385 /* SlitherlinkSolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1814F423A2FF8F002E6385 /* SlitherlinkSolverTests.swift */; };
+		4D4E6EBE23AAB21300C4E584 /* ABCPathBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EBD23AAB21300C4E584 /* ABCPathBoard.swift */; };
+		4D4E6EC023AAB22100C4E584 /* ABCPathBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EBF23AAB22100C4E584 /* ABCPathBoardParser.swift */; };
+		4D4E6EC223AAB23400C4E584 /* ABCPathSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EC123AAB23400C4E584 /* ABCPathSolver.swift */; };
+		4D4E6EC523AC337B00C4E584 /* ABCPathBoardParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EC423AC337B00C4E584 /* ABCPathBoardParserTests.swift */; };
+		4D4E6EC623AC33BF00C4E584 /* ABCPathBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EBF23AAB22100C4E584 /* ABCPathBoardParser.swift */; };
+		4D4E6EC723AC33EF00C4E584 /* ABCPathSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EC123AAB23400C4E584 /* ABCPathSolver.swift */; };
+		4D4E6EC823AC343700C4E584 /* ABCPathBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EBD23AAB21300C4E584 /* ABCPathBoard.swift */; };
 		4D78C5B7238DF3C10032456A /* SlitherlinkBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5B6238DF3C10032456A /* SlitherlinkBoard.swift */; };
 		4D78C5B9238DF4370032456A /* SlitherlinkBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5B8238DF4370032456A /* SlitherlinkBoardParser.swift */; };
 		4D78C5BC238EF9E00032456A /* SlitherlinkBoardParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */; };
@@ -103,6 +110,10 @@
 		4D0DD146237B789500A11F8D /* BoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardParserTests.swift; sourceTree = "<group>"; };
 		4D0DD152237CCF7900A11F8D /* SudokuSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudokuSolver.swift; sourceTree = "<group>"; };
 		4D1814F423A2FF8F002E6385 /* SlitherlinkSolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkSolverTests.swift; sourceTree = "<group>"; };
+		4D4E6EBD23AAB21300C4E584 /* ABCPathBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathBoard.swift; sourceTree = "<group>"; };
+		4D4E6EBF23AAB22100C4E584 /* ABCPathBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathBoardParser.swift; sourceTree = "<group>"; };
+		4D4E6EC123AAB23400C4E584 /* ABCPathSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathSolver.swift; sourceTree = "<group>"; };
+		4D4E6EC423AC337B00C4E584 /* ABCPathBoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathBoardParserTests.swift; sourceTree = "<group>"; };
 		4D78C5B6238DF3C10032456A /* SlitherlinkBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoard.swift; sourceTree = "<group>"; };
 		4D78C5B8238DF4370032456A /* SlitherlinkBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoardParser.swift; sourceTree = "<group>"; };
 		4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoardParserTests.swift; sourceTree = "<group>"; };
@@ -177,6 +188,7 @@
 		4D0DD1192374BA1000A11F8D /* My ExtensionTests */ = {
 			isa = PBXGroup;
 			children = (
+				4D4E6EC323AC331200C4E584 /* ABCPath */,
 				4D78C5BA238EF9C30032456A /* Slitherlink */,
 				4DB6D917237F4D3E004B292E /* KillerSudoku */,
 				4D0DD145237B785F00A11F8D /* Sudoku */,
@@ -196,6 +208,7 @@
 		4D0DD1282374BA1000A11F8D /* My Extension Extension */ = {
 			isa = PBXGroup;
 			children = (
+				4D4E6EBC23AAB1EF00C4E584 /* ABCPath */,
 				4D78C5B5238DECDF0032456A /* Slitherlink */,
 				4DB6D90D237F06AE004B292E /* KillerSudoku */,
 				4D0DD142237B73BC00A11F8D /* Sudoku */,
@@ -226,6 +239,24 @@
 				4DB6D90A237DE617004B292E /* SolverTests.swift */,
 			);
 			path = Sudoku;
+			sourceTree = "<group>";
+		};
+		4D4E6EBC23AAB1EF00C4E584 /* ABCPath */ = {
+			isa = PBXGroup;
+			children = (
+				4D4E6EBD23AAB21300C4E584 /* ABCPathBoard.swift */,
+				4D4E6EBF23AAB22100C4E584 /* ABCPathBoardParser.swift */,
+				4D4E6EC123AAB23400C4E584 /* ABCPathSolver.swift */,
+			);
+			path = ABCPath;
+			sourceTree = "<group>";
+		};
+		4D4E6EC323AC331200C4E584 /* ABCPath */ = {
+			isa = PBXGroup;
+			children = (
+				4D4E6EC423AC337B00C4E584 /* ABCPathBoardParserTests.swift */,
+			);
+			path = ABCPath;
 			sourceTree = "<group>";
 		};
 		4D78C5B5238DECDF0032456A /* Slitherlink */ = {
@@ -410,14 +441,18 @@
 			files = (
 				4D0DD151237C7CDB00A11F8D /* SudokuBoardParser.swift in Sources */,
 				4D78C5BD238EFA420032456A /* SlitherlinkBoardParser.swift in Sources */,
+				4D4E6EC623AC33BF00C4E584 /* ABCPathBoardParser.swift in Sources */,
 				4DB6D915237F2CD9004B292E /* KillerSudokuBoardParser.swift in Sources */,
 				4DB6D90F237F1095004B292E /* KillerSudokuSolver.swift in Sources */,
+				4D4E6EC823AC343700C4E584 /* ABCPathBoard.swift in Sources */,
 				4DB6D912237F1F22004B292E /* KillerSudokuBoard.swift in Sources */,
 				4D78C5BE238EFA460032456A /* SlitherlinkBoard.swift in Sources */,
 				4D78C5C1238F317B0032456A /* SlitherlinkSolver.swift in Sources */,
 				4D0DD147237B789500A11F8D /* BoardParserTests.swift in Sources */,
 				4DB6D90C237DE663004B292E /* SudokuSolver.swift in Sources */,
+				4D4E6EC523AC337B00C4E584 /* ABCPathBoardParserTests.swift in Sources */,
 				4DB6D90B237DE617004B292E /* SolverTests.swift in Sources */,
+				4D4E6EC723AC33EF00C4E584 /* ABCPathSolver.swift in Sources */,
 				4D78C5BC238EF9E00032456A /* SlitherlinkBoardParserTests.swift in Sources */,
 				4D1814F523A2FF8F002E6385 /* SlitherlinkSolverTests.swift in Sources */,
 				4DB6D919237F4D6D004B292E /* KillerSudokuBoardParserTests.swift in Sources */,
@@ -431,13 +466,16 @@
 				4D0DD144237B748B00A11F8D /* SudokuBoardParser.swift in Sources */,
 				4DB6D916237F2CD9004B292E /* KillerSudokuBoardParser.swift in Sources */,
 				4D78C5B7238DF3C10032456A /* SlitherlinkBoard.swift in Sources */,
+				4D4E6EBE23AAB21300C4E584 /* ABCPathBoard.swift in Sources */,
 				4D78C5B9238DF4370032456A /* SlitherlinkBoardParser.swift in Sources */,
+				4D4E6EC223AAB23400C4E584 /* ABCPathSolver.swift in Sources */,
 				4D78C5C0238F0DC70032456A /* SlitherlinkSolver.swift in Sources */,
 				4DB6D910237F1095004B292E /* KillerSudokuSolver.swift in Sources */,
 				4DB6D913237F1F22004B292E /* KillerSudokuBoard.swift in Sources */,
 				4D0DD12C2374BA1000A11F8D /* SafariExtensionViewController.swift in Sources */,
 				4D0DD153237CCF7900A11F8D /* SudokuSolver.swift in Sources */,
 				4D0DD12A2374BA1000A11F8D /* SafariExtensionHandler.swift in Sources */,
+				4D4E6EC023AAB22100C4E584 /* ABCPathBoardParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -51,35 +51,50 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             let parser = KillerSudokuBoardParser(source:source)
             let board = parser.parsed
             let solver = KillerSudokuSolver(board:board)
-            if (solver.solve()) {
+            if solver.solve() {
                 answer["type"] = "Sudoku"
                 answer["solution"] = solver.solution
             }
             else {
                 answer["error"] = "No solution found for Killer Sudoku"
             }
+            break
         case "Sudoku":
             let parser = SudokuBoardParser(source:source)
             let board = parser.parsed
             let solver = SudokuSolver(board:board)
-            if (solver.solve()) {
+            if solver.solve() {
                 answer["type"] = "Sudoku"
                 answer["solution"] = solver.solution
             }
             else {
                 answer["error"] = "No solution found for Sudoku"
             }
+            break
         case "Slitherlink":
             let parser = SlitherlinkBoardParser(source:source)
             let board = parser.parsed
             let solver = SlitherlinkSolver(board:board)
-            if (solver.solve()) {
+            if solver.solve() {
                 answer["type"] = "Slitherlink"
                 answer["solution"] = ["hor":solver.solution["hor"], "ver":solver.solution["ver"]]
             }
             else {
                 answer["error"] = "No solution found for Slitherlink"
             }
+            break
+        case "ABCPath":
+            let parser = ABCPathBoardParser(source:source)
+            let board = parser.parsed;
+            let solver = ABCPathSolver(board)
+            if solver.solve() {
+                answer["type"] = "ABCPath"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for ABC Path"
+            }
+            break
         default:
             answer["error"] = "Unknown type: \(type)"
         }

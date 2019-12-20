@@ -26,6 +26,10 @@ function sendPageToExtension() {
           safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"Slitherlink"})
           return;
     }
+    element = document.querySelector(".futoshikitable");
+    if (element !== null) {
+        safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"ABCPath"})
+    }
 }
 
 function handleMessage(event) {
@@ -63,6 +67,16 @@ function handleMessage(event) {
                 let image = document.querySelector("#squareV" + i);
                 if (image != null) {
                     image.src = "/gifs_slitherlink/" + ver.charAt(i) + "v.gif"
+                }
+            }
+            break;
+        case "ABCPath":
+            for (i = 0 ; i < 5 ; ++i) {
+                for (j = 0 ; j < 5 ; ++j) {
+                    let input = document.querySelector("#BBabcpathinput" + (i + 1) + (j + 1));
+                    if (input != null) {
+                        input.value = solution.charAt(5 * i + j);
+                    }
                 }
             }
             break;

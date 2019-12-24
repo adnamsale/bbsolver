@@ -85,7 +85,7 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             break
         case "ABCPath":
             let parser = ABCPathBoardParser(source:source)
-            let board = parser.parsed;
+            let board = parser.parsed
             let solver = ABCPathSolver(board)
             if solver.solve() {
                 answer["type"] = "ABCPath"
@@ -93,6 +93,18 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             }
             else {
                 answer["error"] = "No solution found for ABC Path"
+            }
+            break
+        case "Bridges":
+            let parser = BridgesBoardParser(source:source)
+            let board = parser.parsed
+            let solver = BridgesSolver(board)
+            if solver.solve() {
+                answer["type"] = "Bridges"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for Bridges"
             }
             break
         default:

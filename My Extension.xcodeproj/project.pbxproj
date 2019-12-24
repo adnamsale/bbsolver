@@ -31,6 +31,13 @@
 		4D4E6EC623AC33BF00C4E584 /* ABCPathBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EBF23AAB22100C4E584 /* ABCPathBoardParser.swift */; };
 		4D4E6EC723AC33EF00C4E584 /* ABCPathSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EC123AAB23400C4E584 /* ABCPathSolver.swift */; };
 		4D4E6EC823AC343700C4E584 /* ABCPathBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4E6EBD23AAB21300C4E584 /* ABCPathBoard.swift */; };
+		4D4F428623B154F100B3A8E9 /* BridgesBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428523B154F100B3A8E9 /* BridgesBoard.swift */; };
+		4D4F428823B1550C00B3A8E9 /* BridgesBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428723B1550C00B3A8E9 /* BridgesBoardParser.swift */; };
+		4D4F428A23B1552200B3A8E9 /* BridgesSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428923B1552200B3A8E9 /* BridgesSolver.swift */; };
+		4D4F428D23B1741F00B3A8E9 /* BridgeBoardParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428C23B1741F00B3A8E9 /* BridgeBoardParserTests.swift */; };
+		4D4F428E23B1745F00B3A8E9 /* BridgesBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428723B1550C00B3A8E9 /* BridgesBoardParser.swift */; };
+		4D4F428F23B1746300B3A8E9 /* BridgesBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428523B154F100B3A8E9 /* BridgesBoard.swift */; };
+		4D4F429023B1746700B3A8E9 /* BridgesSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F428923B1552200B3A8E9 /* BridgesSolver.swift */; };
 		4D78C5B7238DF3C10032456A /* SlitherlinkBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5B6238DF3C10032456A /* SlitherlinkBoard.swift */; };
 		4D78C5B9238DF4370032456A /* SlitherlinkBoardParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5B8238DF4370032456A /* SlitherlinkBoardParser.swift */; };
 		4D78C5BC238EF9E00032456A /* SlitherlinkBoardParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */; };
@@ -114,6 +121,10 @@
 		4D4E6EBF23AAB22100C4E584 /* ABCPathBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathBoardParser.swift; sourceTree = "<group>"; };
 		4D4E6EC123AAB23400C4E584 /* ABCPathSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathSolver.swift; sourceTree = "<group>"; };
 		4D4E6EC423AC337B00C4E584 /* ABCPathBoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ABCPathBoardParserTests.swift; sourceTree = "<group>"; };
+		4D4F428523B154F100B3A8E9 /* BridgesBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgesBoard.swift; sourceTree = "<group>"; };
+		4D4F428723B1550C00B3A8E9 /* BridgesBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgesBoardParser.swift; sourceTree = "<group>"; };
+		4D4F428923B1552200B3A8E9 /* BridgesSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgesSolver.swift; sourceTree = "<group>"; };
+		4D4F428C23B1741F00B3A8E9 /* BridgeBoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeBoardParserTests.swift; sourceTree = "<group>"; };
 		4D78C5B6238DF3C10032456A /* SlitherlinkBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoard.swift; sourceTree = "<group>"; };
 		4D78C5B8238DF4370032456A /* SlitherlinkBoardParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoardParser.swift; sourceTree = "<group>"; };
 		4D78C5BB238EF9E00032456A /* SlitherlinkBoardParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlitherlinkBoardParserTests.swift; sourceTree = "<group>"; };
@@ -188,6 +199,7 @@
 		4D0DD1192374BA1000A11F8D /* My ExtensionTests */ = {
 			isa = PBXGroup;
 			children = (
+				4D4F428B23B173F700B3A8E9 /* Bridges */,
 				4D4E6EC323AC331200C4E584 /* ABCPath */,
 				4D78C5BA238EF9C30032456A /* Slitherlink */,
 				4DB6D917237F4D3E004B292E /* KillerSudoku */,
@@ -208,6 +220,7 @@
 		4D0DD1282374BA1000A11F8D /* My Extension Extension */ = {
 			isa = PBXGroup;
 			children = (
+				4D4F428423B154D700B3A8E9 /* Bridges */,
 				4D4E6EBC23AAB1EF00C4E584 /* ABCPath */,
 				4D78C5B5238DECDF0032456A /* Slitherlink */,
 				4DB6D90D237F06AE004B292E /* KillerSudoku */,
@@ -257,6 +270,24 @@
 				4D4E6EC423AC337B00C4E584 /* ABCPathBoardParserTests.swift */,
 			);
 			path = ABCPath;
+			sourceTree = "<group>";
+		};
+		4D4F428423B154D700B3A8E9 /* Bridges */ = {
+			isa = PBXGroup;
+			children = (
+				4D4F428523B154F100B3A8E9 /* BridgesBoard.swift */,
+				4D4F428723B1550C00B3A8E9 /* BridgesBoardParser.swift */,
+				4D4F428923B1552200B3A8E9 /* BridgesSolver.swift */,
+			);
+			path = Bridges;
+			sourceTree = "<group>";
+		};
+		4D4F428B23B173F700B3A8E9 /* Bridges */ = {
+			isa = PBXGroup;
+			children = (
+				4D4F428C23B1741F00B3A8E9 /* BridgeBoardParserTests.swift */,
+			);
+			path = Bridges;
 			sourceTree = "<group>";
 		};
 		4D78C5B5238DECDF0032456A /* Slitherlink */ = {
@@ -443,9 +474,13 @@
 				4D78C5BD238EFA420032456A /* SlitherlinkBoardParser.swift in Sources */,
 				4D4E6EC623AC33BF00C4E584 /* ABCPathBoardParser.swift in Sources */,
 				4DB6D915237F2CD9004B292E /* KillerSudokuBoardParser.swift in Sources */,
+				4D4F428E23B1745F00B3A8E9 /* BridgesBoardParser.swift in Sources */,
+				4D4F428D23B1741F00B3A8E9 /* BridgeBoardParserTests.swift in Sources */,
 				4DB6D90F237F1095004B292E /* KillerSudokuSolver.swift in Sources */,
 				4D4E6EC823AC343700C4E584 /* ABCPathBoard.swift in Sources */,
+				4D4F429023B1746700B3A8E9 /* BridgesSolver.swift in Sources */,
 				4DB6D912237F1F22004B292E /* KillerSudokuBoard.swift in Sources */,
+				4D4F428F23B1746300B3A8E9 /* BridgesBoard.swift in Sources */,
 				4D78C5BE238EFA460032456A /* SlitherlinkBoard.swift in Sources */,
 				4D78C5C1238F317B0032456A /* SlitherlinkSolver.swift in Sources */,
 				4D0DD147237B789500A11F8D /* BoardParserTests.swift in Sources */,
@@ -468,8 +503,11 @@
 				4D78C5B7238DF3C10032456A /* SlitherlinkBoard.swift in Sources */,
 				4D4E6EBE23AAB21300C4E584 /* ABCPathBoard.swift in Sources */,
 				4D78C5B9238DF4370032456A /* SlitherlinkBoardParser.swift in Sources */,
+				4D4F428823B1550C00B3A8E9 /* BridgesBoardParser.swift in Sources */,
+				4D4F428623B154F100B3A8E9 /* BridgesBoard.swift in Sources */,
 				4D4E6EC223AAB23400C4E584 /* ABCPathSolver.swift in Sources */,
 				4D78C5C0238F0DC70032456A /* SlitherlinkSolver.swift in Sources */,
+				4D4F428A23B1552200B3A8E9 /* BridgesSolver.swift in Sources */,
 				4DB6D910237F1095004B292E /* KillerSudokuSolver.swift in Sources */,
 				4DB6D913237F1F22004B292E /* KillerSudokuBoard.swift in Sources */,
 				4D0DD12C2374BA1000A11F8D /* SafariExtensionViewController.swift in Sources */,

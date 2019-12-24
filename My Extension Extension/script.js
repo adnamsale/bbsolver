@@ -30,6 +30,10 @@ function sendPageToExtension() {
     if (element !== null) {
         safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"ABCPath"})
     }
+    element = document.querySelector(".BridgesTable");
+    if (element !== null) {
+        safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"Bridges"})
+    }
 }
 
 function handleMessage(event) {
@@ -77,6 +81,14 @@ function handleMessage(event) {
                     if (input != null) {
                         input.value = solution.charAt(5 * i + j);
                     }
+                }
+            }
+            break;
+        case "Bridges":
+            for (i = 0 ; i < solution.length ; ++i) {
+                let image = document.querySelector("#square" + i);
+                if (image != null && solution.charAt(i) !== ' ') {
+                    image.src = "/gifs_bridges_new/" + solution.charAt(i) + ".gif";
                 }
             }
             break;

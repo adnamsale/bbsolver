@@ -40,7 +40,7 @@ class BridgesSolver {
         var chars:[Character] = Array.init(repeating: " ", count: board.dim * board.dim)
         for i in 0..<state.count {
             var c:Character = " "
-            let isHor:Bool = board.lines[i].clueStart.i == board.lines[i].clueEnd.i
+            let isHor:Bool = board.clues[board.lines[i].clueStart].i == board.clues[board.lines[i].clueEnd].i
             if state[i] == ONELINE {
                 c = isHor ? "-" : "i"
             }
@@ -51,8 +51,8 @@ class BridgesSolver {
                 continue
             }
             let delta = isHor ? 1 : board.dim
-            var pos = board.lines[i].clueStart.i * board.dim + board.lines[i].clueStart.j + delta
-            let end = board.lines[i].clueEnd.i * board.dim + board.lines[i].clueEnd.j
+            var pos = board.clues[board.lines[i].clueStart].i * board.dim + board.clues[board.lines[i].clueStart].j + delta
+            let end = board.clues[board.lines[i].clueEnd].i * board.dim + board.clues[board.lines[i].clueEnd].j
             while pos < end {
                 chars[pos] = c
                 pos += delta
@@ -177,6 +177,47 @@ class BridgesSolver {
                 return false
             }
             state[move.line] = move.newValue
+            if move.newValue == NOLINES && !checkIsland(state, move.line) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    // Returns true if we haven't created an island by setting the given line to 0
+    private func checkIsland(_ state:[Int], _ line:Int) -> Bool {
+        var reachable1:Set<Int> = Set<Int>()
+        let isIsland1 = isIsland(state, board.lines[line].clueStart, &reachable1)
+        var reachable2:Set<Int> = Set<Int>()
+        let isIsland2 = isIsland(state, board.lines[line].clueEnd, &reachable2)
+        
+        if isIsland1 && isIsland2 && reachable1.count == board.clues.count {
+            // Special case - we've solved the puzzle so not an isolated subset
+            return true
+        }
+        return !isIsland1 && !isIsland2
+    }
+    
+    private func isIsland(_ state:[Int], _ seed:Int, _ reachable:inout Set<Int>) -> Bool {
+        var todo:[Int] = [seed]
+        while todo.count != 0 {
+            let elem:Int = todo.removeLast()
+            if !reachable.contains(elem) {
+                reachable.insert(elem)
+                for line in board.clues[elem].lines {
+                    if state[line] == ONELINE || state[line] == TWOLINES {
+                        if !reachable.contains(board.lines[line].clueStart) {
+                            todo.append(board.lines[line].clueStart)
+                        }
+                        if !reachable.contains(board.lines[line].clueEnd) {
+                            todo.append(board.lines[line].clueEnd)
+                        }
+                    }
+                    else if state[line] != NOLINES {
+                        return false
+                    }
+                }
+            }
         }
         return true
     }

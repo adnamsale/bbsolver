@@ -26,8 +26,8 @@ public class BridgesBoard {
     }
     
     struct Line {
-        let clueStart:Clue
-        let clueEnd:Clue
+        let clueStart:Int
+        let clueEnd:Int
     }
     
     var clues:[Clue] = []
@@ -39,20 +39,21 @@ public class BridgesBoard {
     }
     
     func buildLines() {
-        var grid:[[Clue?]] = Array.init(repeating: Array<Clue?>.init(repeating: nil, count: dim), count: dim)
-        for clue in clues {
-            grid[clue.i][clue.j] = clue
+        var grid:[[Int?]] = Array.init(repeating: Array<Int?>.init(repeating: nil, count: dim), count: dim)
+        for i in 0..<clues.count {
+            grid[clues[i].i][clues[i].j] = i
         }
-        for clue in clues {
+        for i in 0..<clues.count {
             // Is there a line to the right?
+            let clue = clues[i]
             var end = clue.j + 1
-            var clueEnd:Clue? = nil
+            var clueEnd:Int? = nil
             while clueEnd == nil && end < dim {
                 clueEnd = grid[clue.i][end]
                 end = end + 1
             }
             if clueEnd != nil {
-                addLine(clue, clueEnd!)
+                addLine(i, clueEnd!)
             }
             // Is the a line down?
             end = clue.i + 1
@@ -62,7 +63,7 @@ public class BridgesBoard {
                 end = end + 1
             }
             if clueEnd != nil {
-                addLine(clue, clueEnd!)
+                addLine(i, clueEnd!)
             }
         }
         buildCrossingLines()
@@ -73,8 +74,10 @@ public class BridgesBoard {
             var crosses:[Int] = []
             for i in 0..<lines.count {
                 let other:Line = lines[i]
-                if other.clueStart.i < line.clueEnd.i && line.clueStart.i < other.clueEnd.i &&
-                    other.clueStart.j < line.clueEnd.j && line.clueStart.j < other.clueEnd.j {
+                if clues[other.clueStart].i < clues[line.clueEnd].i &&
+                        clues[line.clueStart].i < clues[other.clueEnd].i &&
+                        clues[other.clueStart].j < clues[line.clueEnd].j &&
+                        clues[line.clueStart].j < clues[other.clueEnd].j {
                     crosses.append(i)
                 }
             }
@@ -82,9 +85,9 @@ public class BridgesBoard {
         }
     }
     
-    private func addLine(_ clueStart:Clue, _ clueEnd:Clue) {
+    private func addLine(_ clueStart:Int, _ clueEnd:Int) {
         lines.append(Line(clueStart: clueStart, clueEnd: clueEnd))
-        clueStart.lines.append(lines.count - 1)
-        clueEnd.lines.append(lines.count - 1)
+        clues[clueStart].lines.append(lines.count - 1)
+        clues[clueEnd].lines.append(lines.count - 1)
     }
 }

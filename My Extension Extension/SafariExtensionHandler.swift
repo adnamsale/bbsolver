@@ -46,6 +46,7 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
         var answer:[String:Any] = [String:Any]()
         let type = userInfo["type"] as! String
         let source = userInfo["source"] as! String
+        
         switch(type) {
         case "KillerSudoku":
             let parser = KillerSudokuBoardParser(source:source)
@@ -106,6 +107,19 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             else {
                 answer["error"] = "No solution found for Bridges"
             }
+            break
+        case "Fillomino":
+            let parser = FillominoBoardParser(source:source)
+            let board = parser.parsed
+            let solver = FillominoSolver(board)
+            if solver.solve() {
+                answer["type"] = "Fillomino"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for Fillomino"
+            }
+
             break
         default:
             answer["error"] = "Unknown type: \(type)"

@@ -29,10 +29,17 @@ function sendPageToExtension() {
     element = document.querySelector(".futoshikitable");
     if (element !== null) {
         safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"ABCPath"})
+        return;
     }
     element = document.querySelector(".BridgesTable");
     if (element !== null) {
         safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"Bridges"})
+        return;
+    }
+    element = document.querySelector("#puzzlediv > .fillingtable");
+    if (element !== null) {
+        safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"Fillomino"})
+        return;
     }
 }
 
@@ -89,6 +96,18 @@ function handleMessage(event) {
                 let image = document.querySelector("#square" + i);
                 if (image != null && solution.charAt(i) !== ' ') {
                     image.src = "/gifs_bridges_new/" + solution.charAt(i) + ".gif";
+                }
+            }
+            break;
+        case "Fillomino":
+            let dim = Math.sqrt(solution.length)
+            for (i = 0 ; i < solution.length ; ++i) {
+                let row = Math.floor(i / dim);
+                let col = i % dim;
+                let id = "#square" + row.toString().padStart(3, "_") + col.toString().padStart(3, "_");
+                let td = document.querySelector(id);
+                if (td != null) {
+                    td.innerHTML = solution.charAt(i)
                 }
             }
             break;

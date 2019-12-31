@@ -11,26 +11,14 @@ import Foundation
 public class FillominoSolver {
     class State {
         var cells:[[Int?]]
+        var cands:[[Set<Int>]]
         
         init(_ board:FillominoBoard) {
+            let dim = board.clues.count
             cells = board.clues
-        }
-        
-        func neighbors(_ i:Int, _ j:Int) -> Set<Int?> {
-            var answer:Set<Int?> = Set<Int?>()
-            if 0 < i {
-                answer.insert(cells[i - 1][j])
-            }
-            if i < cells.count - 1 {
-                answer.insert(cells[i + 1][j])
-            }
-            if 0 < j {
-                answer.insert(cells[i][j - 1])
-            }
-            if j < cells[i].count - 1 {
-                answer.insert(cells[i][j + 1])
-            }
-            return answer
+            cands = Array.init(repeating: Array.init(repeating: Set<Int>(), count: dim), count:dim)
+            buildCands()
+            filterCands()
         }
         
         func check(_ i:Int, _ j:Int) -> Bool {
@@ -68,7 +56,7 @@ public class FillominoSolver {
             return true
         }
         
-        func count(_ i:Int, _ j:Int) -> (Int, Bool) {
+        private func count(_ i:Int, _ j:Int) -> (Int, Bool) {
             let dim = cells.count
             let clue = cells[i][j]
             var count = 0
@@ -117,6 +105,66 @@ public class FillominoSolver {
             }
             return (count, closed)
         }
+        
+        private func buildCands() {
+            for i in 0..<cells.count {
+                for j in 0..<cells[i].count {
+                    if nil != cells[i][j] {
+                        addCands(i, j, cells[i][j]!, 1)
+                    }
+                }
+            }
+        }
+        
+        private func addCands(_ i:Int, _ j:Int, _ value:Int, _ dist:Int) {
+            if value < dist {
+                return
+            }
+            if nil == cells[i][j] {
+                cands[i][j].insert(value)
+            }
+            else if 1 != dist {
+                return
+            }
+            if 0 < i {
+                addCands(i - 1, j, value, dist + 1)
+            }
+            if i < cells.count - 1 {
+                addCands(i + 1, j, value, dist + 1)
+            }
+            if 0 < j {
+                addCands(i, j - 1, value, dist + 1)
+            }
+            if j < cells[i].count - 1 {
+                addCands(i, j + 1, value, dist + 1)
+            }
+        }
+        
+        private func filterCands() {
+            var didOne:Bool = true
+            while didOne {
+                didOne = false
+                for i in 0..<cells.count {
+                    for j in 0..<cells[i].count {
+                        if nil == cells[i][j] {
+                            for value in cands[i][j] {
+                                cells[i][j] = value
+                                if !check(i, j) {
+                                    cands[i][j].remove(value)
+                                }
+                            }
+                            if cands[i][j].count == 1 {
+                                cells[i][j] = cands[i][j].first!
+                                didOne = true
+                            }
+                            else {
+                                cells[i][j] = nil
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private let board:FillominoBoard
@@ -146,10 +194,8 @@ public class FillominoSolver {
                 if nil != state.cells[i][j] {
                     continue
                 }
-                var neighbors:Set<Int?> = state.neighbors(i, j)
-                fixNeighbors(&neighbors)
-                for val in neighbors {
-                    state.cells[i][j] = val!
+                for val in state.cands[i][j] {
+                    state.cells[i][j] = val
                     if !state.check(i, j) {
                         continue
                     }
@@ -162,17 +208,5 @@ public class FillominoSolver {
             }
         }
         return true
-    }
-    
-    private func fixNeighbors(_ neighbors:inout Set<Int?>) {
-        if neighbors.contains(1) {
-            neighbors.remove(1)
-        }
-        if neighbors.contains(nil) {
-            neighbors.remove(nil)
-            for i in 3...9 {
-                neighbors.insert(i)
-            }
-        }
     }
 }

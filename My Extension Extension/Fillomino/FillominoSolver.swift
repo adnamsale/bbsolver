@@ -16,9 +16,11 @@ public class FillominoSolver {
         init(_ board:FillominoBoard) {
             let dim = board.clues.count
             cells = board.clues
-            cands = Array.init(repeating: Array.init(repeating: Set<Int>(), count: dim), count:dim)
-            buildCands()
-            filterCands()
+            repeat {
+                cands = Array.init(repeating: Array.init(repeating: Set<Int>(), count: dim), count:dim)
+                buildCands()
+            }
+            while filterCands()
         }
         
         func check(_ i:Int, _ j:Int) -> Bool {
@@ -46,20 +48,24 @@ public class FillominoSolver {
         
         private func checkCounts(_ i:Int, _ j:Int) -> Bool {
             let clue = cells[i][j]!
-            let (total, closed) = count(i, j)
+            let (total, max, closed) = count(i, j)
             if clue < total {
                 return false
             }
             if total < clue && closed {
                 return false
             }
+            if max < clue {
+                return false
+            }
             return true
         }
         
-        private func count(_ i:Int, _ j:Int) -> (Int, Bool) {
+        private func count(_ i:Int, _ j:Int) -> (Int, Int, Bool) {
             let dim = cells.count
-            let clue = cells[i][j]
+            let clue = cells[i][j]!
             var count = 0
+            var max = 0
             var closed = true
             var reachable:[[Bool]] = Array.init(repeating: Array.init(repeating: false, count: dim), count: dim)
             var todo:[(Int, Int)] = [(i, j)]
@@ -103,14 +109,42 @@ public class FillominoSolver {
                     }
                 }
             }
-            return (count, closed)
+            reachable = Array.init(repeating: Array.init(repeating: false, count: dim), count: dim)
+            todo = [(i, j)]
+            while 0 != todo.count {
+                let pos = todo.removeLast()
+                if reachable[pos.0][pos.1] {
+                    continue
+                }
+                reachable[pos.0][pos.1] = true
+                max = max + 1
+                if clue <= max {
+                    break;
+                }
+                if 0 < pos.0 && (cells[pos.0 - 1][pos.1] == nil || cells[pos.0 - 1][pos.1] == clue) {
+                    todo.append((pos.0 - 1, pos.1))
+                }
+                if pos.0 < dim - 1 && (cells[pos.0 + 1][pos.1] == nil || cells[pos.0 + 1][pos.1] == clue) {
+                    todo.append((pos.0 + 1, pos.1))
+                }
+                if 0 < pos.1 && (cells[pos.0][pos.1 - 1] == nil || cells[pos.0][pos.1 - 1] == clue) {
+                    todo.append((pos.0, pos.1 - 1))
+                }
+                if pos.1 < dim - 1 && (cells[pos.0][pos.1 + 1] == nil || cells[pos.0][pos.1 + 1] == clue) {
+                    todo.append((pos.0, pos.1 + 1))
+                }
+            }
+            return (count, max, closed)
         }
         
         private func buildCands() {
             for i in 0..<cells.count {
                 for j in 0..<cells[i].count {
                     if nil != cells[i][j] {
-                        addCands(i, j, cells[i][j]!, 1)
+                        let (total, _, _) = count(i, j)
+                        if (total < cells[i][j]!) {
+                            addCands(i, j, cells[i][j]!, total)
+                        }
                     }
                 }
             }
@@ -120,28 +154,24 @@ public class FillominoSolver {
             if value < dist {
                 return
             }
-            if nil == cells[i][j] {
-                cands[i][j].insert(value)
-            }
-            else if 1 != dist {
-                return
-            }
-            if 0 < i {
+            cands[i][j].insert(value)
+            if 0 < i && nil == cells[i - 1][j] {
                 addCands(i - 1, j, value, dist + 1)
             }
-            if i < cells.count - 1 {
+            if i < cells.count - 1 && nil == cells[i + 1][j] {
                 addCands(i + 1, j, value, dist + 1)
             }
-            if 0 < j {
+            if 0 < j && nil == cells[i][j - 1]{
                 addCands(i, j - 1, value, dist + 1)
             }
-            if j < cells[i].count - 1 {
+            if j < cells[i].count - 1 && nil == cells[i][j + 1] {
                 addCands(i, j + 1, value, dist + 1)
             }
         }
         
-        private func filterCands() {
+        private func filterCands() -> Bool {
             var didOne:Bool = true
+            var answer:Bool = false
             while didOne {
                 didOne = false
                 for i in 0..<cells.count {
@@ -156,6 +186,7 @@ public class FillominoSolver {
                             if cands[i][j].count == 1 {
                                 cells[i][j] = cands[i][j].first!
                                 didOne = true
+                                answer = true
                             }
                             else {
                                 cells[i][j] = nil
@@ -164,6 +195,7 @@ public class FillominoSolver {
                     }
                 }
             }
+            return answer
         }
     }
     

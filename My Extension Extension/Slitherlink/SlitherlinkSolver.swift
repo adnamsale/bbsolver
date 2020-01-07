@@ -200,6 +200,7 @@ class SlitherlinkSolver {
         else {
             return false
         }
+        
         // No forced moves, so just find the next move
         for i in 0...dim {
             for j in 1...dim {
@@ -389,6 +390,8 @@ class SlitherlinkSolver {
         // Special cases
         handleLineIntoClueThree(state, &answer)
         handleLineIntoClueOne(state, &answer)
+        handleLineIntoClueTwo(state, &answer)
+//        handleIslands(state, &answer) This seems to take more time than it saves...
         return answer
     }
     
@@ -436,18 +439,22 @@ class SlitherlinkSolver {
             for j in 0..<dim {
                 if board.clue(i, j) == clue {
                     if state.hor[i][j] == true || state.ver[j][i] == true {
+                        mismatchPair(state, Direction.HOR, i, j, Direction.VER, j, i, &answer)
                         appendMove(state, Direction.HOR, i + 1, j + 1, value, &answer)
                         appendMove(state, Direction.VER, j + 1, i + 1, value, &answer)
                     }
-                    if state.hor[i][j + 2] == true || state.ver[j + 1][i] == true{
+                    if state.hor[i][j + 2] == true || state.ver[j + 1][i] == true {
+                        mismatchPair(state, Direction.HOR, i, j + 2, Direction.VER, j + 1, i, &answer)
                         appendMove(state, Direction.HOR, i + 1, j + 1, value, &answer)
                         appendMove(state, Direction.VER, j, i + 1, value, &answer)
                     }
                     if state.hor[i + 1][j] == true || state.ver[j][i + 2] == true {
+                        mismatchPair(state, Direction.HOR, i + 1, j, Direction.VER, j, i + 2, &answer)
                         appendMove(state, Direction.HOR, i, j + 1, value, &answer)
                         appendMove(state, Direction.VER, j + 1, i + 1, value, &answer)
                     }
                     if state.hor[i + 1][j + 2] == true || state.ver[j + 1][i + 2] == true {
+                        mismatchPair(state, Direction.HOR, i + 1, j + 2, Direction.VER, j + 1, i + 2, &answer)
                         appendMove(state, Direction.HOR, i, j + 1, value, &answer)
                         appendMove(state, Direction.VER, j, i + 1, value, &answer)
                     }
@@ -490,8 +497,31 @@ class SlitherlinkSolver {
         }
     }
 
+    private func handleIslands(_ state:SlitherlinkState, _ answer:inout [SlitherlinkMove]) {
+        for i in 0...dim {
+            for j in 1...dim {
+                if state.hor[i][j] == nil {
+                    state.hor[i][j] = true
+                    if !checkLoop(state, Direction.HOR, i, j) {
+                        state.hor[i][j] = nil
+                        appendMove(state, Direction.HOR, i, j, false, &answer)
+                    }
+                    state.hor[i][j] = nil
+                }
+                if state.ver[i][j] == nil {
+                    state.ver[i][j] = true
+                    if !checkLoop(state, Direction.VER, i, j) {
+                        state.ver[i][j] = nil
+                        appendMove(state, Direction.VER, i, j, false, &answer)
+                    }
+                    state.ver[i][j] = nil
+                }
+            }
+        }
+    }
+    
     private func mismatchPair(_ state:SlitherlinkState, _ dir1:Direction, _ i1:Int, _ j1:Int, _ dir2:Direction, _ i2:Int, _ j2:Int, _ moves:inout [SlitherlinkMove]) {
-        if let current1 = state.get(dir1, i1, j2) {
+        if let current1 = state.get(dir1, i1, j1) {
             appendMove(state, dir2, i2, j2, !current1, &moves)
         }
         else {

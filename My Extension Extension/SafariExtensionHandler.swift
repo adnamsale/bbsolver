@@ -121,6 +121,17 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             }
 
             break
+        case "LightUp":
+            let parser = LightUpBoardParser(source:source)
+            let board = parser.parsed
+            let solver = LightUpSolver(board)
+            if solver.solve() {
+                answer["type"] = "LightUp"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for LightUp"
+            }
         default:
             answer["error"] = "Unknown type: \(type)"
         }

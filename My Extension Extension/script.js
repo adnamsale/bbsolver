@@ -41,6 +41,11 @@ function sendPageToExtension() {
         safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"Fillomino"})
         return;
     }
+    element = document.querySelector(".lightuptable");
+    if (element !== null) {
+        safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"LightUp"})
+        return;
+    }
 }
 
 function handleMessage(event) {
@@ -108,6 +113,22 @@ function handleMessage(event) {
                 let td = document.querySelector(id);
                 if (td != null) {
                     td.innerHTML = solution.charAt(i)
+                }
+            }
+            break;
+        case "LightUp":
+            for (i = 0 ; i < solution.length ; ++i) {
+                let image = document.querySelector("#square" + i);
+                if (image != null && solution.charAt(i) !== ' ') {
+                    if (solution.charAt(i) === 'B') {
+                        image.src = "gifs_lightup/bulb.gif";
+                    }
+                    else if (solution.charAt(i) === 'X') {
+                        image.src = "gifs_lightup/crsy.gif";
+                    }
+                    else {
+                        image.src = "gifs_lightup/yell.gif"
+                    }
                 }
             }
             break;

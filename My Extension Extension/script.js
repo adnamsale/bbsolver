@@ -46,6 +46,11 @@ function sendPageToExtension() {
         safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"LightUp"})
         return;
     }
+    element = document.querySelector(".NonoTable");
+    if (element !== null) {
+        safari.extension.dispatchMessage(message, {"source":element.innerHTML, "type":"Nonogrids"});
+        return;
+    }
 }
 
 function handleMessage(event) {
@@ -128,6 +133,22 @@ function handleMessage(event) {
                     }
                     else {
                         image.src = "gifs_lightup/yell.gif"
+                    }
+                }
+            }
+            break;
+        case "Nonogrids":
+            for (i = 0 ; i < solution.length ; ++i) {
+                let image = document.querySelector("#square" + i);
+                if (image != null) {
+                    if (solution.charAt(i) === 'B') {
+                        image.src = "/gifs_nonogrids/y.gif";
+                    }
+                    else if (solution.charAt(i) === 'W') {
+                        image.src = "/gifs_nonogrids/x.gif";
+                    }
+                    else {
+                        image.src = "/gifs_nonogrids/n.gif";
                     }
                 }
             }

@@ -132,6 +132,17 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             else {
                 answer["error"] = "No solution found for LightUp"
             }
+        case "Nonogrids":
+            let parser = NonogridsBoardParser(source:source)
+            let board = parser.parsed
+            let solver = NonogridsSolver(board)
+            if solver.solve() {
+                answer["type"] = "Nonogrids"
+                answer["solution"] = solver.solution
+            }
+            else {
+                answer["error"] = "No solution found for Nonogrids"
+            }
         default:
             answer["error"] = "Unknown type: \(type)"
         }

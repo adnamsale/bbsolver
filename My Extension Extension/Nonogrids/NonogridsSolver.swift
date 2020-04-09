@@ -60,6 +60,18 @@ public class NonogridsSolver {
         }
     }
     
+    class Move {
+        let i:Int
+        let j:Int
+        let val:Bool
+        
+        init(_ i:Int, _ j:Int, _ val:Bool) {
+            self.i = i
+            self.j = j
+            self.val = val
+        }
+    }
+    
     private let board:NonogridsBoard
     
     init(_ board:NonogridsBoard) {
@@ -94,7 +106,13 @@ public class NonogridsSolver {
                     let (dBlack, dWhite) = findMoves(dActual, dTarget, dTerm, board.dim - i)
                     if aBlack && dBlack {
                         state.cells[i][j] = true
-                        answer = solveRecurse(&state)
+                        let forced = findForcedMoves(&state)
+                        if nil != forced {
+                            answer = solveRecurse(&state)
+                            if !answer {
+                                rollback(&state, forced!)
+                            }
+                        }
                     }
                     if !answer && aWhite && dWhite {
                         state.cells[i][j] = false
@@ -112,6 +130,10 @@ public class NonogridsSolver {
     }
     
     func findMoves(_ actual:[Int], _ target:[Int], _ term:Bool, _ remain:Int) -> (Bool, Bool) {
+        // Quick guard check - if forced moves have given us too many runs then bail
+        if target.count < actual.count {
+            return (false, false)
+        }
         // Quick guard check - if we don't have enough spaces remaining in the row/column to
         // meet the number of required black squares then there are no possible moves
         if actual.reduce(0, +) + remain < target.reduce(0, +) {
@@ -137,5 +159,83 @@ public class NonogridsSolver {
             }
         }
         return answer
+    }
+    
+    func findForcedMoves(_ state:inout State) -> [Move]? {
+        var didOne = true
+        var answer:[Move] = []
+        
+        while (didOne) {
+            didOne = false
+            for i in 0..<board.dim {
+                let aTarget:[Int] = board.getAcross(i)
+                if !findForcedHelper(i, 0, 0, 1, aTarget, &state, &answer, &didOne) {
+                    rollback(&state, answer)
+                    return nil
+                }
+                let dTarget:[Int] = board.getDown(i)
+                if !findForcedHelper(0, i, 1, 0, dTarget, &state, &answer, &didOne) {
+                    rollback(&state, answer)
+                    return nil
+                }
+            }
+        }
+        return answer
+    }
+        
+    func findForcedHelper(_ iStart:Int, _ jStart:Int, _ iDelta:Int, _ jDelta:Int, _ target:[Int], _ state:inout State, _ moves:inout [Move], _ didOne: inout Bool) -> Bool {
+        let (actual, term) = state.getProgress(iStart, jStart, iDelta, jDelta)
+        if target.count < actual.count {
+            return false
+        }
+        for k in 0..<actual.count {
+            if target[k] < actual[k] {
+                return false
+            }
+        }
+        if 0 != actual.count && !term && actual.last! <= target[actual.count - 1] {
+            var iRunStart = iStart
+            var jRunStart = jStart
+            while iRunStart < board.dim && jRunStart < board.dim && state.cells[iRunStart][jRunStart] != nil {
+                iRunStart = iRunStart + iDelta
+                jRunStart = jRunStart + jDelta
+            }
+            let iRunEnd = iRunStart + (target[actual.count - 1] - actual.last!) * iDelta
+            let jRunEnd = jRunStart + (target[actual.count - 1] - actual.last!) * jDelta
+            if board.dim < iRunEnd || board.dim < jRunEnd {
+                return false
+            }
+            var i = iRunStart
+            var j = jRunStart
+            while i < iRunEnd || j < jRunEnd {
+                if state.cells[i][j] == nil {
+                    state.cells[i][j] = true
+                    moves.append(Move(i, j, true))
+                    didOne = true
+                }
+                else if state.cells[i][j] == false {
+                    return false
+                }
+                i = i + iDelta
+                j = j + jDelta
+            }
+            if iRunEnd < board.dim && jRunEnd < board.dim {
+                if state.cells[iRunEnd][jRunEnd] == nil {
+                    state.cells[iRunEnd][jRunEnd] = false
+                    moves.append(Move(iRunEnd, jRunEnd, false))
+                    didOne = true
+                }
+                else if state.cells[iRunEnd][jRunEnd] == true {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
+    func rollback(_ state:inout State, _ moves:[Move]) {
+        for move in moves {
+            state.cells[move.i][move.j] = nil
+        }
     }
 }
